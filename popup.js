@@ -16,6 +16,10 @@ document.getElementById("toggleButton").addEventListener("click", function () {
         // Deactivate the extension on this tab
         chrome.storage.local.remove("activeTabId", function () {
           setButtonText(false);
+
+          chrome.storage.local.set({ noScrollbar: false });
+          // Reload the current tab after deactivation
+          chrome.tabs.reload(activeTab.id);
         });
         // Optionally, you can also run a script to undo any changes made by the content script
       } else {
@@ -25,6 +29,8 @@ document.getElementById("toggleButton").addEventListener("click", function () {
             target: { tabId: activeTab.id },
             files: ["content.js"],
           });
+
+          chrome.storage.local.set({ noScrollbar: true });
 
           const url = new URL(tabs[0].url);
           const domainKey = "heroDelay_" + url.hostname; // e.g., heroDelay_example.com

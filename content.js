@@ -21,12 +21,6 @@ function addRedLineAt(distanceToTop) {
 }
 
 function smoothScrollByDistances(durationPerPixel, distances) {
-  // Hide scrollbar
-  var style = document.createElement("style");
-  style.type = "text/css";
-  style.innerHTML = `html::-webkit-scrollbar { width: 0px; }`;
-  document.getElementsByTagName("head")[0].appendChild(style);
-
   const currentDomain = window.location.hostname;
   const domainKey = "heroDelay_" + currentDomain;
 
@@ -88,10 +82,48 @@ function captureAndScrollByDistances() {
     if (event.key === "Enter" || event.keyCode === 13) {
       const heroDelay = parseFloat(localStorage.getItem("heroDelay")) || 0; // Default to 0 if not set
       window.scrollTo(0, 0); // Scroll to top
-      setTimeout(() => {
-        localStorage.setItem("distancesToTop", JSON.stringify(distancesToTop));
-        location.reload();
-      }, heroDelay * 1000); // Convert heroDelay to milliseconds
+
+      // Create the overlay
+      const overlay = document.createElement("div");
+      overlay.style.position = "fixed";
+      overlay.style.top = "0";
+      overlay.style.left = "0";
+      overlay.style.width = "100%";
+      overlay.style.height = "100%";
+      overlay.style.backgroundColor = "rgba(0,0,0,0.8)";
+      overlay.style.zIndex = "9999";
+      overlay.style.display = "flex";
+      overlay.style.justifyContent = "center";
+      overlay.style.alignItems = "center";
+
+      // Create the countdown element
+      const countdown = document.createElement("div");
+      countdown.style.fontSize = "5rem";
+      countdown.style.color = "white";
+      countdown.textContent = "3"; // Start from 3
+
+      overlay.appendChild(countdown);
+      document.body.appendChild(overlay);
+
+      let counter = 3;
+      const interval = setInterval(() => {
+        counter--;
+        if (counter >= 0) {
+          countdown.textContent = counter;
+        } else {
+          clearInterval(interval);
+          overlay.remove(); // Remove the overlay
+
+          // Continue with the existing logic
+          setTimeout(() => {
+            localStorage.setItem(
+              "distancesToTop",
+              JSON.stringify(distancesToTop)
+            );
+            location.reload();
+          }, heroDelay * 1000); // Convert heroDelay to milliseconds
+        }
+      }, 1000);
     }
   });
 
