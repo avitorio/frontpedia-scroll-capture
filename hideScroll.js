@@ -1,5 +1,4 @@
 chrome.storage.local.get(["noScrollbar"], function (result) {
-  console.log({ result });
   if (result.noScrollbar) {
     // Hide scrollbar
     var style = document.createElement("style");
